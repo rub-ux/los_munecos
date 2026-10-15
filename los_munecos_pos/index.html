@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Punto de Venta - Los Muñecos</title>
+    <!-- Importando fuente de Google y FontAwesome para iconos -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Paleta de colores Premium de "Los Muñecos" */
+        :root {
+            --bg-main: #0f0f0f;
+            --bg-panel: #1c1c1c;
+            --brand-yellow: #FFC107;
+            --brand-yellow-hover: #ffca2c;
+            --text-main: #ffffff;
+            --text-muted: #888888;
+            --border-color: #2c2c2c;
+            --danger: #FF4C4C;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Nunito', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* --- BARRA LATERAL (NAV) --- */
+        .sidebar {
+            width: 80px;
+            background-color: var(--bg-panel);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 20px;
+            border-right: 1px solid var(--border-color);
+            box-shadow: 2px 0 10px rgba(0,0,0,0.5);
+            z-index: 10;
+        }
+        .sidebar-logo {
+            width: 50px;
+            height: 50px;
+            background-color: var(--brand-yellow);
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #000;
+            font-weight: 900;
+            font-size: 22px;
+            margin-bottom: 40px;
+            box-shadow: 0 4px 10px rgba(255, 193, 7, 0.3);
+        }
+        .sidebar-icon {
+            color: var(--text-muted);
+            font-size: 24px;
+            margin-bottom: 35px;
+            cursor: pointer;
+            transition: 0.3s;
+            position: relative;
+        }
+        .sidebar-icon:hover, .sidebar-icon.active {
+            color: var(--brand-yellow);
+        }
+        .sidebar-icon.active::after {
+            content: '';
+            position: absolute;
+            right: -28px;
+            top: 50%;
+            transform: translateY(-50%);
+            height: 20px;
+            width: 4px;
+            background-color: var(--brand-yellow);
+            border-radius: 4px 0 0 4px;
+        }
+
+        /* --- CONTENIDO PRINCIPAL --- */
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 30px;
+            overflow: hidden;
+        }
+        
+        .header-title {
+            font-size: 2.2rem;
+            font-weight: 900;
+            margin-bottom: 25px;
+            color: var(--text-main);
+            letter-spacing: 1px;
+        }
+        .header-title span { color: var(--brand-yellow); }
+
+        /* --- CATEGORIAS --- */
+        .categorias {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+        .categorias::-webkit-scrollbar { height: 0px; }
+
+        .btn-cat {
+            background-color: var(--bg-panel);
+            border: 2px solid var(--border-color);
+            color: var(--text-muted);
+            padding: 12px 25px;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            white-space: nowrap;
+            font-family: 'Nunito', sans-serif;
+        }
+        .btn-cat:hover {
+            border-color: #444;
+            color: var(--text-main);
+        }
+        .btn-cat.active {
+            background-color: rgba(255, 193, 7, 0.1);
+            border-color: var(--brand-yellow);
+            color: var(--brand-yellow);
+        }
+
+        /* --- PRODUCTOS --- */
+        .productos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
+            overflow-y: auto;
+            padding-right: 10px;
+            padding-bottom: 20px;
+        }
+        .productos-grid::-webkit-scrollbar { width: 6px; }
+        .productos-grid::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 10px; }
+
+        .producto-card {
+            background-color: var(--bg-panel);
+            border-radius: 20px;
+            padding: 25px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            border: 2px solid var(--border-color);
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        .producto-card:hover {
+            border-color: var(--brand-yellow);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+        }
+        .producto-icon {
+            font-size: 50px;
+            color: var(--text-muted);
+            margin-bottom: 15px;
+            transition: 0.3s;
+        }
+        .producto-card:hover .producto-icon {
+            color: var(--brand-yellow);
+            transform: scale(1.1);
+        }
+        .producto-titulo {
+            font-size: 1.2rem;
+            font-weight: 800;
+            margin-bottom: 5px;
+            text-align: center;
+        }
+        .producto-precio {
+            color: var(--brand-yellow);
+            font-size: 1.4rem;
+            font-weight: 900;
+        }
+
+        /* --- TICKET (PANEL DERECHO) --- */
+        .ticket-section {
+            width: 400px;
+            background-color: var(--bg-panel);
+            border-left: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            box-shadow: -2px 0 10px rgba(0,0,0,0.3);
+            z-index: 5;
+        }
+        .ticket-header {
+            padding: 25px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .ticket-header h2 { margin: 0; font-size: 1.6rem; font-weight: 900; }
+        .btn-limpiar {
+            background: rgba(255, 76, 76, 0.1);
+            border: none;
+            color: var(--danger);
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: 0.2s;
+        }
+        .btn-limpiar:hover { background: var(--danger); color: white; }
+
+        .lista-orden {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 20px 25px;
+        }
+        .lista-orden::-webkit-scrollbar { width: 4px; }
+        .lista-orden::-webkit-scrollbar-thumb { background: var(--border-color); }
+
+        .item-orden {
+            background-color: var(--bg-main);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+        }
+        .item-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+        .item-mods {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-top: 10px;
+            border-top: 1px dashed var(--border-color);
+            padding-top: 8px;
+        }
+        .btn-quitar {
+            background: transparent;
+            border: none;
+            color: var(--danger);
+            font-size: 1.3rem;
+            cursor: pointer;
+            margin-left: 10px;
+            opacity: 0.7;
+        }
+        .btn-quitar:hover { opacity: 1; transform: scale(1.1); }
+
+        .totales {
+            background-color: var(--bg-panel);
+            padding: 25px;
+            border-top: 1px solid var(--border-color);
+        }
+        .fila-total {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 20px;
+        }
+        .total-texto { font-size: 1.2rem; color: var(--text-muted); font-weight: 700; }
+        .total-numero { font-size: 2.8rem; color: var(--brand-yellow); font-weight: 900; line-height: 1; }
+        
+        .btn-accion {
+            width: 100%;
+            padding: 20px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.3rem;
+            font-weight: 900;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            font-family: 'Nunito', sans-serif;
+        }
+        .btn-cobrar { background-color: var(--brand-yellow); color: #000; box-shadow: 0 5px 15px rgba(255, 193, 7, 0.2); }
+        .btn-cobrar:hover { background-color: var(--brand-yellow-hover); transform: translateY(-2px); }
+
+        /* --- MODAL --- */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(5px); }
+        .modal-box { background: var(--bg-panel); padding: 35px; border-radius: 20px; width: 450px; max-width: 90%; border: 1px solid var(--border-color); box-shadow: 0 25px 50px rgba(0,0,0,0.5); }
+        .modal-box h3 { margin-top: 0; color: var(--brand-yellow); border-bottom: 2px solid var(--border-color); padding-bottom: 15px; font-size: 1.6rem; font-weight: 900; }
+        
+        .opciones-titulo { font-size: 0.9rem; color: var(--text-muted); text-transform: uppercase; font-weight: 800; margin: 20px 0 10px 0; letter-spacing: 1px; }
+        
+        .opcion-mod { display: flex; justify-content: space-between; align-items: center; background: var(--bg-main); padding: 15px 20px; border-radius: 12px; margin-bottom: 12px; cursor: pointer; border: 2px solid transparent; transition: 0.2s; font-size: 1.1rem; font-weight: 700; }
+        .opcion-mod:hover { border-color: var(--border-color); }
+        .opcion-mod.seleccionado { border-color: var(--brand-yellow); background: rgba(255, 193, 7, 0.05); color: var(--brand-yellow); }
+        .opcion-mod .check-icon { display: none; color: var(--brand-yellow); font-size: 1.3rem; }
+        .opcion-mod.seleccionado .check-icon { display: block; }
+        
+        .btn-confirmar { background: var(--brand-yellow); color: #000; margin-top: 30px; }
+        .btn-cerrar-modal { background: transparent; color: var(--text-muted); border: 2px solid var(--border-color); margin-top: 15px; }
+        .btn-cerrar-modal:hover { color: var(--text-main); border-color: var(--text-muted); }
+
+        /* --- ADAPTACIÓN PARA CELULARES (RESPONSIVE) --- */
+        @media (max-width: 900px) {
+            body {
+                flex-direction: column;
+                overflow-y: auto;
+            }
+            
+            /* La barra lateral se vuelve un menú inferior o superior */
+            .sidebar {
+                width: 100%;
+                height: 60px;
+                flex-direction: row;
+                justify-content: space-around;
+                padding: 0;
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+                order: 3; /* Mandar al fondo en celular */
+            }
+            .sidebar-logo { display: none; }
+            .sidebar i { margin-bottom: 0; margin-top: 20px; font-size: 24px; }
+
+            /* El contenido principal toma todo el ancho */
+            .main-content {
+                padding: 15px;
+                order: 1;
+                overflow: visible;
+            }
+            .top-header, .search-bar-row {
+                flex-direction: column;
+                gap: 15px;
+                padding: 15px 0;
+                align-items: flex-start;
+            }
+            .search-input { width: 100%; }
+            
+            /* El ticket pasa abajo de los productos */
+            .ticket-section {
+                width: 100%;
+                border-left: none;
+                border-top: 2px solid var(--brand-yellow);
+                order: 2;
+            }
+
+            /* Forzamos 2 columnas en celular y reducimos los espacios */
+            .productos-grid {
+                grid-template-columns: repeat(2, 1fr); 
+                gap: 10px;
+                padding: 10px 0;
+            }
+            
+            /* Hacemos las tarjetas más pequeñas y compactas */
+            .producto-card {
+                padding: 12px 8px; 
+                height: auto; 
+                flex-direction: column; 
+                align-items: center;
+                text-align: center;
+            }
+
+            /* Reducimos textos e iconos para que quepan bien */
+            .producto-titulo {
+                font-size: 0.95rem; 
+                margin-bottom: 5px;
+            }
+            
+            .producto-precio {
+                font-size: 1.1rem;
+            }
+
+            .producto-icon {
+                font-size: 35px;
+                margin-bottom: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Barra Lateral -->
+    <div class="sidebar">
+        <div class="sidebar-logo">LM</div>
+        <i class="fa-solid fa-house sidebar-icon active" title="Punto de Venta"></i>
+        <i class="fa-solid fa-clock-rotate-left sidebar-icon" title="Historial"></i>
+        <i class="fa-solid fa-box sidebar-icon" title="Inventario"></i>
+        <i class="fa-solid fa-gear sidebar-icon" style="margin-top: auto; margin-bottom: 20px;" title="Ajustes"></i>
+    </div>
+
+    <!-- Contenido Principal -->
+    <div class="main-content">
+        <div class="header-title">Menú <span>Los Muñecos</span></div>
+        <div class="categorias" id="contenedorCategorias"></div>
+        <div class="productos-grid" id="gridProductos">
+            <h3 style="color: var(--text-muted);">Conectando con la base de datos...</h3>
+        </div>
+    </div>
+    
+    <!-- Ticket / Comanda -->
+    <div class="ticket-section">
+        <div class="ticket-header">
+            <h2>Comanda</h2>
+            <button class="btn-limpiar" onclick="limpiarCarrito()" title="Vaciar Comanda"><i class="fa-solid fa-trash"></i></button>
+        </div>
+        
+        <div class="lista-orden" id="listaOrden">
+            <!-- El estado vacío se dibuja desde JS -->
+        </div>
+        
+        <div class="totales">
+            <div class="fila-total">
+                <span class="total-texto">Total Neto</span>
+                <span class="total-numero" id="precioTotal">$0.00</span>
+            </div>
+            <button class="btn-accion btn-cobrar" onclick="cobrarOrden()">
+                <i class="fa-solid fa-money-bill-wave"></i> Cobrar Orden
+            </button>
+        </div>
+    </div>
+
+    <!-- Ventana Modal de Personalización -->
+    <div class="modal-overlay" id="modalModificadores">
+        <div class="modal-box">
+            <h3 id="modalTitulo">Personalizar</h3>
+            
+            <div class="opciones-titulo">Complementos Extras</div>
+            <div id="opcionesExtras">
+                <div class="opcion-mod" id="modPapas" onclick="toggleMod('modPapas')">
+                    <span><i class="fa-solid fa-plus" style="color: var(--brand-yellow); margin-right: 8px;"></i> Con Papas (+$10.00)</span>
+                    <i class="fa-solid fa-circle-check check-icon"></i>
+                </div>
+            </div>
+
+            <div class="opciones-titulo">Quitar Ingredientes</div>
+            <div id="opcionesQuitar">
+                <div class="opcion-mod" id="modSinCebolla" onclick="toggleMod('modSinCebolla')">
+                    <span><i class="fa-solid fa-minus" style="color: var(--danger); margin-right: 8px;"></i> Sin Cebolla</span>
+                    <i class="fa-solid fa-circle-check check-icon"></i>
+                </div>
+                <div class="opcion-mod" id="modSinJitomate" onclick="toggleMod('modSinJitomate')">
+                    <span><i class="fa-solid fa-minus" style="color: var(--danger); margin-right: 8px;"></i> Sin Jitomate</span>
+                    <i class="fa-solid fa-circle-check check-icon"></i>
+                </div>
+            </div>
+
+            <button class="btn-accion btn-confirmar" onclick="confirmarProducto()">Agregar a la Orden</button>
+            <button class="btn-accion btn-cerrar-modal" onclick="cerrarModal()">Cancelar</button>
+        </div>
+    </div>
+
+    <script>
+        let productosBD = [];
+        let carrito = [];
+        let categoriaActual = 'Hamburguesas';
+        let productoTemp = null; 
+        let modificadoresTemp = [];
+
+        // Retorna un icono basado en el nombre de la categoría
+        function getIconoCategoria(cat) {
+            if(cat === 'Hamburguesas') return '<i class="fa-solid fa-burger"></i>';
+            if(cat === 'Complementos') return '<i class="fa-solid fa-box-open"></i>';
+            if(cat === 'Bebidas') return '<i class="fa-solid fa-bottle-water"></i>';
+            return '<i class="fa-solid fa-utensils"></i>';
+        }
+
+        async function cargarProductos() {
+            try {
+                const respuesta = await fetch('api/productos.php');
+                productosBD = await respuesta.json();
+                
+                if(productosBD.error) {
+                    document.getElementById('gridProductos').innerHTML = `<p style="color:var(--danger);">${productosBD.error}</p>`;
+                    return;
+                }
+                
+                renderizarCategorias();
+                renderizarProductos(categoriaActual);
+            } catch (error) {
+                document.getElementById('gridProductos').innerHTML = '<p style="color:var(--danger);">Error de conexión con el servidor.</p>';
+            }
+        }
+
+        function renderizarCategorias() {
+            const categoriasUnicas = [...new Set(productosBD.map(p => p.categoria))];
+            const contenedor = document.getElementById('contenedorCategorias');
+            contenedor.innerHTML = '';
+            
+            categoriasUnicas.forEach(cat => {
+                const btn = document.createElement('button');
+                btn.className = 'btn-cat' + (cat === categoriaActual ? ' active' : '');
+                btn.innerHTML = `${getIconoCategoria(cat)} ${cat}`;
+                btn.onclick = () => {
+                    categoriaActual = cat;
+                    renderizarCategorias(); 
+                    renderizarProductos(cat); 
+                };
+                contenedor.appendChild(btn);
+            });
+        }
+
+        function renderizarProductos(categoria) {
+            const grid = document.getElementById('gridProductos');
+            grid.innerHTML = '';
+            
+            const filtrados = productosBD.filter(p => p.categoria === categoria);
+            
+            filtrados.forEach(prod => {
+                grid.innerHTML += `
+                    <div class="producto-card" onclick="agregarAlCarrito(${prod.id})">
+                        <div class="producto-icon">${getIconoCategoria(prod.categoria)}</div>
+                        <div class="producto-titulo">${prod.nombre}</div>
+                        <div class="producto-precio">$${parseFloat(prod.precio).toFixed(2)}</div>
+                    </div>
+                `;
+            });
+        }
+
+        function agregarAlCarrito(id) {
+            const producto = productosBD.find(p => p.id == id);
+            
+            // Si no es hamburguesa, va directo al ticket
+            if (producto.categoria !== 'Hamburguesas') {
+                carrito.push({...producto, modificadoresStr: ''});
+                actualizarTicket();
+                return;
+            }
+
+            productoTemp = {...producto}; 
+            modificadoresTemp = []; 
+            document.querySelectorAll('.opcion-mod').forEach(el => el.classList.remove('seleccionado'));
+            
+            document.getElementById('modalTitulo').innerHTML = `<i class="fa-solid fa-burger" style="margin-right:10px;"></i>${producto.nombre}`;
+            document.getElementById('modalModificadores').style.display = 'flex';
+        }
+
+        function toggleMod(idElemento) {
+            const el = document.getElementById(idElemento);
+            el.classList.toggle('seleccionado');
+            
+            let nombreMod = '';
+            let precioExtra = 0;
+
+            if (idElemento === 'modPapas') { nombreMod = 'Con Papas'; precioExtra = 10; }
+            if (idElemento === 'modSinCebolla') { nombreMod = 'Sin Cebolla'; precioExtra = 0; }
+            if (idElemento === 'modSinJitomate') { nombreMod = 'Sin Jitomate'; precioExtra = 0; }
+
+            if (el.classList.contains('seleccionado')) {
+                modificadoresTemp.push({ nombre: nombreMod, precio: precioExtra });
+            } else {
+                modificadoresTemp = modificadoresTemp.filter(m => m.nombre !== nombreMod);
+            }
+        }
+
+        function cerrarModal() {
+            document.getElementById('modalModificadores').style.display = 'none';
+            productoTemp = null;
+        }
+
+        function confirmarProducto() {
+            let precioFinal = parseFloat(productoTemp.precio);
+            let nombresMods = [];
+
+            modificadoresTemp.forEach(mod => {
+                precioFinal += mod.precio;
+                nombresMods.push(mod.nombre);
+            });
+
+            carrito.push({
+                ...productoTemp,
+                precio: precioFinal, 
+                modificadoresStr: nombresMods.length > 0 ? nombresMods.join(' • ') : ''
+            });
+
+            cerrarModal();
+            actualizarTicket();
+        }
+
+        function actualizarTicket() {
+            const lista = document.getElementById('listaOrden');
+            
+            if(carrito.length === 0) {
+                lista.innerHTML = `
+                    <div style="text-align:center; color: var(--border-color); margin-top: 60px;">
+                        <i class="fa-solid fa-basket-shopping" style="font-size: 5rem; margin-bottom: 20px;"></i>
+                        <h3 style="margin:0; color: var(--text-muted);">Comanda Vacía</h3>
+                        <p style="font-size: 0.9rem; color: #555;">Agrega productos para comenzar</p>
+                    </div>
+                `;
+                document.getElementById('precioTotal').innerText = '$0.00';
+                return;
+            }
+            
+            lista.innerHTML = '';
+            let total = 0;
+            
+            carrito.forEach((item, index) => {
+                total += parseFloat(item.precio);
+                let modsHtml = item.modificadoresStr ? `<div class="item-mods">${item.modificadoresStr}</div>` : '';
+
+                lista.innerHTML += `
+                    <div class="item-orden">
+                        <div class="item-top">
+                            <span>1x ${item.nombre}</span>
+                            <div style="display: flex; align-items: center;">
+                                <span style="color: var(--brand-yellow);">$${parseFloat(item.precio).toFixed(2)}</span>
+                                <button class="btn-quitar" onclick="eliminarDelCarrito(${index})" title="Quitar"><i class="fa-solid fa-xmark"></i></button>
+                            </div>
+                        </div>
+                        ${modsHtml}
+                    </div>
+                `;
+            });
+            
+            document.getElementById('precioTotal').innerText = `$${total.toFixed(2)}`;
+        }
+
+        function eliminarDelCarrito(index) {
+            carrito.splice(index, 1);
+            actualizarTicket();
+        }
+
+        function limpiarCarrito() {
+            if(carrito.length > 0 && confirm('¿Seguro que deseas vaciar toda la comanda?')) {
+                carrito = [];
+                actualizarTicket();
+            }
+        }
+
+        async function cobrarOrden() {
+            if (carrito.length === 0) {
+                alert("Agrega al menos un producto para cobrar.");
+                return;
+            }
+
+            // Efecto visual de carga en el botón
+            const btn = document.querySelector('.btn-cobrar');
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Procesando...';
+            btn.style.pointerEvents = 'none';
+
+            const totalCalculado = carrito.reduce((sum, item) => sum + parseFloat(item.precio), 0);
+
+            const payload = {
+                carrito: carrito,
+                total: totalCalculado
+            };
+
+            try {
+                const respuesta = await fetch('api/guardar_orden.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const resultado = await respuesta.json();
+
+                if (resultado.success) {
+                    alert(`¡Venta registrada! Ticket #${resultado.orden_id}`);
+                    carrito = []; // Vaciamos el carrito
+                    actualizarTicket(); // Limpiamos la pantalla
+                } else {
+                    alert("Error: " + resultado.error);
+                }
+            } catch (error) {
+                console.error(error);
+                alert("Fallo de conexión al intentar cobrar.");
+            } finally {
+                // Restauramos el botón
+                btn.innerHTML = '<i class="fa-solid fa-money-bill-wave"></i> Cobrar Orden';
+                btn.style.pointerEvents = 'auto';
+            }
+        }
+
+        // Iniciar
+        cargarProductos();
+    </script>
+</body>
+</html>
